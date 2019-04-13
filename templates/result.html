@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+   <body>
+        <form name="result">
+        Possible 0 and 1 hop routes are:<br>
+        <input class="textview" name"result" size="200" value="{{ result }}">
+        </form><br>
+
+
+        <form method="post" action="/result">
+        <div class"form-group">
+           Enter Source:<br>
+           <input type="text" name="src"><br>
+           Enter Destination:<br>
+           <input type="text" name="dest"><br><br>
+        </div>
+   <input class="btn" type="submit" value="Submit">
+</form>
+   </body>
+</html>
