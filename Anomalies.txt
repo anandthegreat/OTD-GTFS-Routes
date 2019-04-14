@@ -1,0 +1,1 @@
+No primary key in stop_times.txt, hence the code became slow.

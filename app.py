@@ -119,72 +119,76 @@ def result():
 					zero_hop_route_IDs.add(x)
 
 		# #-----------------------------------------
-		count=0
+		countRoutes=0
 		result=""
 		if(len(zero_hop_route_IDs)>0):
+			countRoutes+=1
 			# print("You can use any of the following 0-hop routes: ")
 			for val in zero_hop_route_IDs:
-				result+="RouteID: "
-				result+=val 
-				result+=" Route Name: "
-				result+=routes_dict[val]
-		else:
-			result="No Route Found"
+				result+=str(countRoutes) + ") "+"0-Hop Route: " + val + " Route Name: " + routes_dict[val]+"  "
+
 
 		# #------------------1-Hop------------------
-		# src_reachable_stops={}			#stops reachable from source 	  <"764"=[s1,s2,s3...]>
-		# dest_reachable_stops={}			#stops reachable from destination <"764"=[s1,s2,s3...]>
-		# src_route_tripIDs={}			#trip ids of all routes which touch the source 		<"764"=[trip1,trip2,trip3...]
-		# dest_route_tripIDs={}			#trip ids of all routes which touch the destination <"764"=[trip1,trip2,trip3...]
-		# src_trip_to_route={}
-		# dest_trip_to_route={}
+		src_reachable_stops={}			#stops reachable from source 	  <"764"=[s1,s2,s3...]>
+		dest_reachable_stops={}			#stops reachable from destination <"764"=[s1,s2,s3...]>
+		src_route_tripIDs={}			#trip ids of all routes which touch the source 		<"764"=[trip1,trip2,trip3...]
+		dest_route_tripIDs={}			#trip ids of all routes which touch the destination <"764"=[trip1,trip2,trip3...]
+		src_trip_to_route={}
+		dest_trip_to_route={}
 
-		# count=0
-		# trips=open("trips.txt","r")
-		# for line in trips:
-		# 	count+=1
-		# 	if(count==1):
-		# 		continue
-		# 	fields=line.rstrip('\n').split(",")
-		# 	if(fields[0] in src_routeIDs):
-		# 		src_route_tripIDs.setdefault(fields[0],[]).append(fields[2])	#save trip id 
-		# 		src_trip_to_route.setdefault(fields[2],fields[0])
+		count=0
+		trips=open("trips.txt","r")
+		for line in trips:
+			count+=1
+			if(count==1):
+				continue
+			fields=line.rstrip('\n').split(",")
+			if(fields[0] in src_routeIDs):
+				src_route_tripIDs.setdefault(fields[0],[]).append(fields[2])	#save trip id 
+				src_trip_to_route.setdefault(fields[2],fields[0])
 
-		# 	if(fields[0] in dest_routeIDs):
-		# 		dest_route_tripIDs.setdefault(fields[0],[]).append(fields[2])
-		# 		dest_trip_to_route.setdefault(fields[2],fields[0])
+			if(fields[0] in dest_routeIDs):
+				dest_route_tripIDs.setdefault(fields[0],[]).append(fields[2])
+				dest_trip_to_route.setdefault(fields[2],fields[0])
 
-		# # print(src_trip_to_route)
-		# count=0
-		# stoptimes=open("stop_times.txt","r")
-		# for line in stoptimes:
-		# 	count+=1
-		# 	if(count==1):
-		# 		continue
-		# 	fields=line.rstrip('\n').split(",")
-		# 	if(fields[0] in src_trip_to_route.keys()):
-		# 		if(fields[3]!=src_stop_id and fields[3]!=dest_stop_id):
-		# 			r=src_trip_to_route.get(fields[0])
-		# 			src_reachable_stops.setdefault(r,[]).append(fields[3])		#save stops which are reachable from source
-		# 	if(fields[0] in dest_route_tripIDs):	
-		# 		if(fields[3]!=src_stop_id and fields[3]!=dest_stop_id):
-		# 			r=dest_trip_to_route.get(fields[0])
-		# 			dest_reachable_stops.setdefault(r,[]).append(fields[3])		#save stops which are reachable from destination
+		# print(dest_route_tripIDs)
+		# print(src_trip_to_route)
+		# print(dest_trip_to_route)
+		count=0
+		stoptimes=open("stop_times.txt","r")
+		for line in stoptimes:
+			count+=1
+			if(count==1):
+				continue
+			fields=line.rstrip('\n').split(",")
+			if(fields[0] in src_trip_to_route.keys()):
+				if(fields[3]!=src_stop_id and fields[3]!=dest_stop_id):
+					r=src_trip_to_route[fields[0]]
+					src_reachable_stops.setdefault(r,set()).add(fields[3])		#save stops which are reachable from source
+			if(fields[0] in dest_trip_to_route.keys()):	
+				if(fields[3]!=src_stop_id and fields[3]!=dest_stop_id):
+					r=dest_trip_to_route[fields[0]]
+					dest_reachable_stops.setdefault(r,set()).add(fields[3])		#save stops which are reachable from destination
 
-		# stoptimes.close()
-
-		# one_hop_routes=set()
-
+		stoptimes.close()
+		# print(src_reachable_stops)
+		one_hop_routes=set()
+		# print(type(src_reachable_stops['102']))
 		# print(src_reachable_stops)
 		# print(dest_reachable_stops)
-		# for bus_no in src_reachable_stops:
-		# 	for bus_no_dest in dest_reachable_stops:
-		# 		if(set(src_reachable_stops.get(bus_no)) & set(dest_reachable_stops.get(bus_no_dest))):
-		# 			one_hop_routes.add(bus_no+"->"+bus_no_dest)
+		countRoutes-=1
+		for bus_no in src_reachable_stops:
+			for bus_no_dest in dest_reachable_stops:
+				if(set(src_reachable_stops.get(bus_no)) & set(dest_reachable_stops.get(bus_no_dest))):
+					countRoutes+=1
+					temp=set()
+					temp=set(src_reachable_stops.get(bus_no)) & set(dest_reachable_stops.get(bus_no_dest))
+					result+=str(countRoutes) + ") " + "1-hop Route: " + bus_no + "-->" + bus_no_dest+" Interchange at stopid: "+ list(temp)[0]+" ****** "  
+					# one_hop_routes.add(bus_no+"->"+bus_no_dest)
 
 		# print("One Hop Routes are:")
 		# for x in one_hop_routes:
-		# 	print(x)	
+		# 	print(x)
 
 		return render_template('result.html',result=result)
 
